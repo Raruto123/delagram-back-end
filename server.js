@@ -40,6 +40,10 @@ app.get("*", checkUser);
 app.get("/jwtid", requireAuth, (req, res) => {
     res.status(200).send(res.locals.user._id)
 });
+app.get("/", (req, res) => {
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+    res.send("API is running")
+})
 
 //routes 
 app.use("/api/user", userRoutes);
