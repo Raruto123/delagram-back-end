@@ -13,8 +13,9 @@ module.exports.checkUser = (req, res, next) => {
             }else{
                 let user = await UserModel.findById(decodedToken.id);
                 res.locals.user = user;
-                next();
+                // next();
             }
+            next();
         })
     }else{
         res.locals.user = null;
@@ -36,5 +37,6 @@ module.exports.requireAuth = (req, res, next) => {
         })
     }else{
         console.log("No Token1");
+        next();
     }
 };
