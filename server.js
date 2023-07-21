@@ -7,7 +7,7 @@ require("dotenv").config({path : "config/.env"});
 require("./config/database");
 const {checkUser} = require("./middleware/auth.middleware.js");
 const {requireAuth} = require("./middleware/auth.middleware.js");
-// const PORT = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 const app = express();
 const cors = require("cors");
 // import fkill from "fkill";
@@ -25,7 +25,7 @@ app.use(bodyParser.json());//pour lire les req.body
 app.use(bodyParser.urlencoded({extended : true}));//req.params
 app.use(cookieParser()); //req.cookies
 const corsOptions = {
-    origin : "http://localhost:3000",
+    origin : "http://localhost:3001",
     credentials : true,
     "allowedHeaders" : ["sessionId", "Content-Type"],
     "exposedHeaders" : ["sessionId"],
@@ -51,6 +51,6 @@ app.use("/api/post", postRoutes);
 // }
 
 // server
-app.listen(process.env.PORT, () => {
-    console.log(`serveur a commencé sur port : ${process.env.PORT}`);
+app.listen(port, () => {
+    console.log(`serveur a commencé sur port : ${port}`);
 })
