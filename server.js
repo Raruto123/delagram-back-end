@@ -25,7 +25,7 @@ app.use(bodyParser.json());//pour lire les req.body
 app.use(bodyParser.urlencoded({extended : true}));//req.params
 app.use(cookieParser()); //req.cookies
 const corsOptions = {
-    origin : true,
+    origin : "https://delagram-app.onrender.com",
     credentials : true,
     "allowedHeaders" : ["sessionId", "Content-Type"],
     "exposedHeaders" : ["sessionId"],
@@ -46,7 +46,6 @@ app.get("/", (req, res) => {
 })
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "https://delagram-app.onrender.com");
-    res.setHeader("Access-Control-Allow-Origin", "https://delagram-app-api.onrender.com");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.setHeader("Access-Control-Allow-Credentials", "true");
