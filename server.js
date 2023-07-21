@@ -25,7 +25,7 @@ app.use(bodyParser.json());//pour lire les req.body
 app.use(bodyParser.urlencoded({extended : true}));//req.params
 app.use(cookieParser()); //req.cookies
 const corsOptions = {
-    origin : ["http://localhost:3001", "https://delagram-app-api.onrender.com"],
+    origin : ["http://localhost:3001", "https://delagram-app-api.onrender.com", "https://delagram-app.onrender.com"],
     credentials : true,
     "allowedHeaders" : ["sessionId", "Content-Type"],
     "exposedHeaders" : ["sessionId"],
