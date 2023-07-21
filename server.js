@@ -46,6 +46,7 @@ app.get("/", (req, res) => {
 })
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "https://delagram-app.onrender.com");
+    res.setHeader("Access-Control-Allow-Origin", "https://delagram-app-api.onrender.com");
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.setHeader("Access-Control-Allow-Credentials", "true");
