@@ -4,10 +4,14 @@ const jwt = require("jsonwebtoken");
 // const TOKEN_SECRET = MAQ5XHB3oemwUpjpieVWFvEH0kKFYeBduE96t1I8xECWfJFS6z7mweYIo4fZaAAQ;
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
-const createToken = (id) => {
-    return jwt.sign({id}, process.env.TOKEN_SECRET, { expiresIn : maxAge
-    } )
-};
+// const createToken = (id) => {
+//     return jwt.sign({id}, process.env.TOKEN_SECRET, { expiresIn : maxAge
+//     } )
+// };
+
+const createToken = (_id) => {
+    return jwt.sign({_id : _id.toString()}, process.env.TOKEN_SECRET, { expiresIn : maxAge} )
+}
 
 //inscription
 module.exports.signUp = async (req, res) => {

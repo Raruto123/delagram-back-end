@@ -11,7 +11,7 @@ module.exports.checkUser = (req, res, next) => {
                 // res.cookie("jwt", "", {maxAge : 1});
                 next();
             }else{
-                let user = await UserModel.findById(decodedToken.id);
+                let user = await UserModel.findById({_id : decodedToken._id});
                 res.locals.user = user;
                 // next();
             }
@@ -49,15 +49,17 @@ module.exports.checkUser = (req, res, next) => {
 module.exports.requireAuth = (req, res, next) => {
     const token = req.cookies.jwt;
     if (token) {
-        try {
-            const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
-            console.log(decodedToken.id);
-            // L'utilisateur est authentifié, vous pouvez accéder aux informations utilisateur si nécessaire
-            // Exemple : res.locals.user = await UserModel.findById(decodedToken.id);
-            next();
-        } catch (err) {
-            res.status(401).json({ error: "Invalid token" }); // Envoyer une réponse JSON avec le statut 401 pour indiquer une erreur d'authentification
-        }
+        jwt.verify(token, process.env.TOKEN_SECRET, async (err, decodedToken) => {
+            if (err) {
+                res.status(401).json({ error: "Invalid or expired token" });
+            }else {
+                console.log(decodedToken._id);
+                let user = await UserModel.findById({_id : decodedToken._id});
+                res.locals.user = user;
+                // Le token est valide, vous pouvez accéder aux informations utilisateur si nécessaire
+                // Exemple : res.locals.user = await UserModel.findById(decodedToken.id);
+                next();
+            }})
     } else {
         res.status(401).json({ error: "No token found" }); // Envoyer une réponse JSON avec le statut 401 pour indiquer qu'aucun token n'est présent dans les cookies de la requête
     }
