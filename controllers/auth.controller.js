@@ -9,9 +9,9 @@ const maxAge = 3 * 24 * 60 * 60 * 1000;
 //     } )
 // };
 
-const createToken = (_id) => {
-    return jwt.sign({_id : _id}, process.env.TOKEN_SECRET, { expiresIn : maxAge} )
-}
+// const createToken = (_id) => {
+//     return jwt.sign({_id : _id}, process.env.TOKEN_SECRET, { expiresIn : maxAge} )
+// }
 
 //inscription
 module.exports.signUp = async (req, res) => {
