@@ -58,7 +58,7 @@ module.exports.requireAuth = (req, res, next) => {
                 res.locals.user = user;
                 // Le token est valide, vous pouvez accéder aux informations utilisateur si nécessaire
                 // Exemple : res.locals.user = await UserModel.findById(decodedToken.id);
-                next();
+                next(); 
             }})
     } else {
         res.status(401).json({ error: "No token found" }); // Envoyer une réponse JSON avec le statut 401 pour indiquer qu'aucun token n'est présent dans les cookies de la requête
