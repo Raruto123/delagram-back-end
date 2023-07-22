@@ -32,7 +32,7 @@ module.exports.requireAuth = (req, res, next) => {
                 console.log(err);
                 // Gérer le cas où le token est invalide ou expiré
                 // Exemple : rediriger l'utilisateur vers une page d'erreur ou le déconnecter
-                res.redirect("/error");
+                res.redirect("/error1");
             }else{
                 console.log(decodedToken.id);
                  // Définir l'utilisateur authentifié dans res.locals.user
@@ -42,7 +42,7 @@ module.exports.requireAuth = (req, res, next) => {
                  } else {
                     // Gérer le cas où l'utilisateur associé au token n'existe pas
                     // Exemple : rediriger l'utilisateur vers une page d'erreur ou le déconnecter
-                    res.redirect("/error");
+                    res.redirect("/error2");
                  }
             }
              // Appeler next() pour passer à la prochaine fonction middleware ou route
@@ -52,6 +52,6 @@ module.exports.requireAuth = (req, res, next) => {
         console.log("No Token1");
         // Gérer le cas où le token n'est pas présent dans les cookies de la requête
         // Exemple : rediriger l'utilisateur vers une page d'erreur ou le déconnecter
-        res.redirect("/error");
+        res.redirect("/error3");
     }
 };
