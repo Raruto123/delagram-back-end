@@ -24,22 +24,41 @@ module.exports.checkUser = (req, res, next) => {
 }
 
 //pour se connecter automatiquement s'il a déjà été connecté auparavant
+
+// module.exports.requireAuth = (req, res, next) => {
+//     const token = req.cookies.jwt;
+//     if (token) {
+//         jwt.verify(token, process.env.TOKEN_SECRET, async(err, decodedToken) => {
+//             if (err) {
+//                 console.log(err);
+//                 res.send(200).json("no token")
+//             }else{
+//                 console.log(decodedToken.id);
+//              // Appeler next() pour passer à la prochaine fonction middleware ou route
+//                 next();
+//         }})
+//     }else{
+//         console.log("No Token1");
+//         // Gérer le cas où le token n'est pas présent dans les cookies de la requête
+//         // Exemple : rediriger l'utilisateur vers une page d'erreur ou le déconnecter
+//         // res.redirect("/error3");
+//     }
+// };
+
+
 module.exports.requireAuth = (req, res, next) => {
     const token = req.cookies.jwt;
     if (token) {
-        jwt.verify(token, process.env.TOKEN_SECRET, async(err, decodedToken) => {
-            if (err) {
-                console.log(err);
-                res.send(200).json("no token")
-            }else{
-                console.log(decodedToken.id);
-             // Appeler next() pour passer à la prochaine fonction middleware ou route
-                next();
-        }})
-    }else{
-        console.log("No Token1");
-        // Gérer le cas où le token n'est pas présent dans les cookies de la requête
-        // Exemple : rediriger l'utilisateur vers une page d'erreur ou le déconnecter
-        // res.redirect("/error3");
+        try {
+            const decodedToken = jwt.verify(token, process.env.TOKEN_SECRET);
+            console.log(decodedToken.id);
+            // L'utilisateur est authentifié, vous pouvez accéder aux informations utilisateur si nécessaire
+            // Exemple : res.locals.user = await UserModel.findById(decodedToken.id);
+            next();
+        } catch (err) {
+            res.status(401).json({ error: "Invalid token" }); // Envoyer une réponse JSON avec le statut 401 pour indiquer une erreur d'authentification
+        }
+    } else {
+        res.status(401).json({ error: "No token found" }); // Envoyer une réponse JSON avec le statut 401 pour indiquer qu'aucun token n'est présent dans les cookies de la requête
     }
 };
