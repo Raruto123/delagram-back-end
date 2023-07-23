@@ -67,4 +67,6 @@ app.use("/api/post", postRoutes);
 // server
 app.listen(port, () => {
     console.log(`serveur a commencé sur port : ${port}`);
-})
+}) 
+
+// jgjg
