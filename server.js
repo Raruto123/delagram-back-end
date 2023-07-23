@@ -22,8 +22,9 @@ const cors = require("cors");
 
 //middleware 
 app.use(bodyParser.json());//pour lire les req.body
-app.use(cookieParser()); //req.cookies
 app.use(bodyParser.urlencoded({extended : true}));//req.params
+app.use(cookieParser()); //req.cookies
+app.set("trust proxy", 1);
 const corsOptions = {
     origin : "https://delagram-app.onrender.com",
     credentials : true,
