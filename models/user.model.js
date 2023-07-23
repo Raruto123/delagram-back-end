@@ -46,12 +46,12 @@ const userSchema = new moongose.Schema({
     likes: {
         type: [String]
     },
-    authTokens : [{
-        authToken : {
-            type : String,
-            require : true
-        }
-    }]
+    // authTokens : [{
+    //     authToken : {
+    //         type : String,
+    //         require : true
+    //     }
+    // }]
 },
     {
         timestamps: true
@@ -80,12 +80,12 @@ userSchema.statics.login = async function(email, password) {
     throw Error("incorrect email");
 };
 
-userSchema.methods.generateAuthTokenAndSaveUser = async function() {
-    const authToken = jwt.sign({_id : this._id.toString()}, process.env.TOKEN_SECRET, {expiresIn : maxAge});
-    this.authTokens.push({authToken});
-    await this.save();
-    return authToken;
-}
+// userSchema.methods.generateAuthTokenAndSaveUser = async function() {
+//     const authToken = jwt.sign({_id : this._id.toString()}, process.env.TOKEN_SECRET, {expiresIn : maxAge});
+//     this.authTokens.push({authToken});
+//     await this.save();
+//     return authToken;
+// }
 
 
 module.exports = mongoose.model("User", userSchema)

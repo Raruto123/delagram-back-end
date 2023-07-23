@@ -36,10 +36,10 @@ app.use(cors(corsOptions));
 
 
 //jwt
-app.get("/jwtid", requireAuth, (req, res) => {
-    res.status(200).send(req.user)
-});
 app.get("*", checkUser);
+app.get("/jwtid", requireAuth, (req, res) => {
+    res.status(200).send(res.locals.user._id)
+});
 
 
 app.get("/", (req, res) => {

@@ -4,10 +4,10 @@ const jwt = require("jsonwebtoken");
 // const TOKEN_SECRET = MAQ5XHB3oemwUpjpieVWFvEH0kKFYeBduE96t1I8xECWfJFS6z7mweYIo4fZaAAQ;
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
-// const createToken = (id) => {
-//     return jwt.sign({id : id}, process.env.TOKEN_SECRET, { expiresIn : maxAge
-//     } )
-// };
+const createToken = (id) => {
+    return jwt.sign({id}, process.env.TOKEN_SECRET, { expiresIn : maxAge
+    } )
+};
 
 // const createToken = (_id) => {
 //     return jwt.sign({_id : _id}, process.env.TOKEN_SECRET, { expiresIn : maxAge} )
@@ -32,9 +32,8 @@ module.exports.signIn = async (req, res) => {
 
     try{
         const user = await UserModel.login(email, password);
-        const authToken = await user.generateAuthTokenAndSaveUser();
-        // const token = createToken(user._id);
-        res.cookie("jwtoken", authToken, {httpOnly : true, maxAge : maxAge})
+        const token = createToken(user._id);
+        res.cookie("jwtoken", token, {httpOnly : true, maxAge})
         res.status(200).json({user : user._id})
 
     }catch(err){
