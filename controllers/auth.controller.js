@@ -35,7 +35,7 @@ module.exports.signIn = async (req, res) => {
         const authToken = await user.generateAuthTokenAndSaveUser();
         // const token = createToken(user._id);
         res.cookie("jwtoken", authToken, {httpOnly : true, maxAge})
-        res.status(200).json({user : user._id}, authToken)
+        res.status(200).json({user : user._id})
 
     }catch(err){
         const errors = signInErrors(err);
