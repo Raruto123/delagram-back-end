@@ -36,10 +36,12 @@ app.use(cors(corsOptions));
 
 
 //jwt
-app.get("*", checkUser);
 app.get("/jwtid", requireAuth, (req, res) => {
     res.status(200).send(req.user)
 });
+app.get("*", checkUser);
+
+
 app.get("/", (req, res) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     res.send("API is running")

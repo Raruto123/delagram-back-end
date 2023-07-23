@@ -58,12 +58,6 @@ const userSchema = new moongose.Schema({
     }
 );
 
-userSchema.methods.generateAuthTokenAndSaveUser = async function() {
-    const authToken = jwt.sign({_id : this._id.toString()}, process.env.TOKEN_SECRET, {expiresIn : maxAge});
-    this.authTokens.push({authToken});
-    await this.save();
-    return authToken;
-}
 
 //joue la fonction avant d'enregistrer le document dans la databse pour crypter le password
 userSchema.pre("save", async function(next) {
@@ -85,6 +79,13 @@ userSchema.statics.login = async function(email, password) {
     }
     throw Error("incorrect email");
 };
+
+userSchema.methods.generateAuthTokenAndSaveUser = async function() {
+    const authToken = jwt.sign({_id : this._id.toString()}, process.env.TOKEN_SECRET, {expiresIn : maxAge});
+    this.authTokens.push({authToken});
+    await this.save();
+    return authToken;
+}
 
 
 module.exports = mongoose.model("User", userSchema)
