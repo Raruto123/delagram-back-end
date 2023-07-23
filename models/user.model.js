@@ -2,6 +2,9 @@ const { default: mongoose } = require("mongoose");
 const moongose = require("mongoose");
 const { isEmail } = require("validator");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const maxAge = 3 * 24 * 60 * 60 * 1000;
+
 
 const userSchema = new moongose.Schema({
     pseudo: {
@@ -42,12 +45,25 @@ const userSchema = new moongose.Schema({
     },
     likes: {
         type: [String]
-    }
+    },
+    authTokens : [{
+        authToken : {
+            type : String,
+            require : true
+        }
+    }]
 },
     {
         timestamps: true
     }
 );
+
+userSchema.methods.generateAuthTokenAndSaveUser = async function() {
+    const authToken = jwt.sign({_id : this._id.toString()}, process.env.TOKEN_SECRET, {expiresIn : maxAge});
+    this.authTokens.push({authToken});
+    await this.save();
+    return authToken;
+}
 
 //joue la fonction avant d'enregistrer le document dans la databse pour crypter le password
 userSchema.pre("save", async function(next) {
