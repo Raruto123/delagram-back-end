@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const postController = require("../controllers/post.controller.js");
 const path = require("path");
-const uploadPath = path.join(__dirname, "..", "client", "public", "uploads", "posts");
+const uploadPath = path.join(__dirname, ".", "uploads", "posts");//Test
 const multer = require("multer");
 const upload = multer({dest : uploadPath});
 

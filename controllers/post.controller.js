@@ -40,7 +40,7 @@ module.exports.createPost = async (req, res) => {
     
         const filePath = path.join(
           __dirname,
-          "../client/public/uploads/posts/",
+          "./uploads/posts/",//test
           fileName
         );
     

@@ -26,7 +26,7 @@ app.use(bodyParser.urlencoded({extended : true}));//req.params
 app.use(cookieParser()); //req.cookies
 app.set("trust proxy", 1);
 const corsOptions = {
-    origin : "https://delagram-app.onrender.com",
+    origin : " https://delagram-app.onrender.com",
     credentials : true,
     "allowedHeaders" : ["sessionId", "Content-Type"],
     "exposedHeaders" : ["sessionId"],
@@ -34,6 +34,7 @@ const corsOptions = {
     "preflightContinue" : false
 };
 app.use(cors(corsOptions));
+app.use("build", express.static(__dirname + "uploads"))//test
 
 
 //jwt

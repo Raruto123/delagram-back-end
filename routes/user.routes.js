@@ -3,7 +3,7 @@ const authController = require("../controllers/auth.controller.js")
 const userController = require("../controllers/user.controller.js")
 const uploadController = require("../controllers/upload.controller.js")
 const path = require("path");
-const uploadPath = path.join(__dirname, "..", "client", "public", "uploads", "profil");
+const uploadPath = path.join(__dirname, ".", "uploads", "profil");//test
 const multer = require("multer");
 const upload = multer({dest : uploadPath});
 
