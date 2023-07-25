@@ -28,8 +28,7 @@ module.exports.uploadProfil = async (req, res) => {
   
       const fileName = req.body.name + ".jpg";
       const filePath = path.join(
-        __dirname,
-        "./uploads/profil",//test
+        "./utilisateurs/uploads/profil",//test
         fileName
       );
   
