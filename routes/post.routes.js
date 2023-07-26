@@ -1,11 +1,11 @@
 const router = require("express").Router();
 const postController = require("../controllers/post.controller.js");
 const path = require("path");
-// const uploadPath = path.join( ".", "utilisateurs", "uploads", "posts")
-// const multer = require("multer");
+const uploadPath = path.join( ".", "utilisateurs", "uploads")
+const multer = require("multer");
 // const storage = multer.memoryStorage();
-// const upload = multer({dest : uploadPath})
-const upload = require("../middleware/multer.js")
+const upload = multer({dest : uploadPath})
+// const upload = require("../middleware/multer.js")
 
 router.post("/", upload.single("file"), postController.createPost);
 router.get("/", postController.readPost);
