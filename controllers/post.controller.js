@@ -9,71 +9,29 @@ const path = require("path");
 const {uploadErrors} = require("../utils/errors.utils.js");
 
 
-//test = 
-
-// Importer la connexion à MongoDB
-const mongoose = require("../config/database");
-
 
 module.exports.createPost = async (req, res) => {
     const fileName = req.body.posterId + Date.now() + ".jpg";
-  
+
     try {
-      const mimetype = mime.lookup(req.file.originalname);
-  
-      if (
-        mimetype !== "image/jpg" &&
-        mimetype !== "image/png" &&
-        mimetype !== "image/jpeg"
-      ) {
-        throw Error("fichier invalide");
-      }
-  
-      if (req.file.size > 500000) {
-        throw Error("max size");
-      }
-  
-      // Écrire le fichier dans GridFS
-      const writeStream = mongoose.gfs.createWriteStream({
-        filename: fileName,
-        content_type: req.file.mimetype,
-      });
-  
-      const readStream = fs.createReadStream(req.file.path);
-      readStream.pipe(writeStream);
-  
-      writeStream.on("close", (file) => {
-        console.log("Image téléchargée avec succès !");
-        // Supprimer le fichier temporaire après le téléchargement
-        fs.unlinkSync(req.file.path);
-  
-        // Créer le nouveau post dans la base de données
         const newPost = new PostModel({
-          posterId: req.body.posterId,
-          message: req.body.message,
-          picture: "/api/post/files/" + fileName,
-          video: req.body.video,
-          likers: [],
-          comments: [],
-        });
-  
-        newPost.save().then((post) => {
-          res.status(201).json({ post: post });
-        }).catch((err) => {
-          res.status(400).json({ message: "Erreur lors de la création du post." });
-        });
-      });
-  
-      writeStream.on("error", (err) => {
-        console.error("Erreur lors de l'écriture du fichier :", err);
-        res.status(500).json({ message: "Erreur lors de l'écriture du fichier." });
-      });
-    } catch (err) {
-      const errors = uploadErrors(err);
-      console.error("Erreur lors du téléchargement de l'image :", err);
-      return res.status(201).json({ errors });
+            posterId: req.body.posterId,
+            message: req.body.message,
+            picture: req.file != null ? "./uploads/posts/" + fileName : "",
+            video: req.body.video,
+            likers: [],
+            comments: []
+        })
+        const post = await newPost.save();
+        res.status(201).json({ post: post });
+    } catch (error) {
+        const errors = uploadErrors(err);
+        console.error("Erreur lors du téléchargement de l'image :", err);
+        return res.status(201).json({ errors });//La principale différence réside dans le format de la réponse renvoyée par le serveur.
+
     }
-  };
+
+}
 
 // module.exports.createPost = async (req, res) => {
 //     const fileName = req.body.posterId + Date.now() + ".jpg";
