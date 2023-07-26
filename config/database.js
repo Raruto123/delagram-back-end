@@ -19,7 +19,7 @@ const path = require("path");
 const fs = require("fs");
 const { pipeline } = require("stream");
 
-mongoose.connect(process.env.MONGODB_URI, {
+mongoose.connect("mongodb+srv://proplayer54:raruto123@cluster0.lvmwmio.mongodb.net/?retryWrites=true&w=majority", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(function () {
