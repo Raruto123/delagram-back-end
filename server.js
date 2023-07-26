@@ -34,7 +34,7 @@ const corsOptions = {
     "preflightContinue" : false
 };
 app.use(cors(corsOptions));
-app.use("build", express.static(__dirname + "uploads"))//test
+app.use(express.static("build"))//test
 
 
 //jwt

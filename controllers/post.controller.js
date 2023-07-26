@@ -9,81 +9,136 @@ const path = require("path");
 const {uploadErrors} = require("../utils/errors.utils.js");
 
 
-// Fonction pour vérifier l'unicité du pseudo avant l'insertion
-const checkUniquePseudo = async (pseudo) => {
-    try {
-      const existingUser = await UserModel.findOne({ pseudo: pseudo });
-      return existingUser ? false : true;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
-  };
+//test = 
+
+// Importer la connexion à MongoDB
+const mongoose = require("../config/database");
+
 
 module.exports.createPost = async (req, res) => {
     const fileName = req.body.posterId + Date.now() + ".jpg";
-
+  
     try {
-        const mimeType = mime.lookup(req.file.originalname);
-    
-        if (
-          mimeType !== "image/jpg" &&
-          mimeType !== "image/png" &&
-          mimeType !== "image/jpeg"
-        ) {
-          throw Error("fichier invalide");
-        }
-    
-        if (req.file.size > 500000) {
-          throw Error("max size");
-        }
-    
-        const filePath = path.join(
-          "./utilisateurs/uploads/posts",//test
-          fileName
-        );
-    
-        if (req.file && req.file.path) {
-          const fileStream = fs.createReadStream(req.file.path);
-          const writeStream = fs.createWriteStream(filePath);
-          await pipeline(fileStream, writeStream);
-          console.log("Image téléchargée avec succès !");
-          // Supprimer le fichier temporaire après le téléchargement
-          fs.unlinkSync(req.file.path);
-    
-          // Mise à jour de l'utilisateur avec la nouvelle image
-        } else {
-          throw Error("Fichier introuvable");
-        }
-      } catch (err) {
-        const errors = uploadErrors(err);
-        console.error("Erreur lors du téléchargement de l'image :", err);
-        return res.status(201).json({errors});//La principale différence réside dans le format de la réponse renvoyée par le serveur.
-
-        // //Lorsque vous utilisez res.status(201).json({errors}), vous renvoyez une réponse au format JSON. 
-        // La méthode json() de l'objet response de Express est utilisée pour convertir l'objet JavaScript en JSON et 
-        // renvoyer cette réponse au client. Cela est généralement utilisé lorsque vous souhaitez renvoyer des données 
-        // structurées au format JSON.
+      const mimetype = mime.lookup(req.file.originalname);
+  
+      if (
+        mimetype !== "image/jpg" &&
+        mimetype !== "image/png" &&
+        mimetype !== "image/jpeg"
+      ) {
+        throw Error("fichier invalide");
       }
-
-
-    const newPost = new PostModel({
-    posterId : req.body.posterId,
-    message : req.body.message,
-    picture : req.file != null ? "./uploads/posts/" + fileName : "",
-    video : req.body.video,
-    likers : [],
-    comments : []
-    })
-    // const {posterId, message, video, likers, comments} = req.body;//destructuring tu aurais pu separer en faisant const = newPost = new postModel.({posterId : req.body.posterId}, ..., likers : [])
-    // const picture = req.file;
-    try {
-        const post = await newPost.save();
-        res.status(201).json({post : post});
-    }catch(err) {
-        res.status(400).send(err);
+  
+      if (req.file.size > 500000) {
+        throw Error("max size");
+      }
+  
+      // Écrire le fichier dans GridFS
+      const writeStream = mongoose.gfs.createWriteStream({
+        filename: fileName,
+        content_type: req.file.mimetype,
+      });
+  
+      const readStream = fs.createReadStream(req.file.path);
+      readStream.pipe(writeStream);
+  
+      writeStream.on("close", (file) => {
+        console.log("Image téléchargée avec succès !");
+        // Supprimer le fichier temporaire après le téléchargement
+        fs.unlinkSync(req.file.path);
+  
+        // Créer le nouveau post dans la base de données
+        const newPost = new PostModel({
+          posterId: req.body.posterId,
+          message: req.body.message,
+          picture: "/api/post/files/" + fileName,
+          video: req.body.video,
+          likers: [],
+          comments: [],
+        });
+  
+        newPost.save().then((post) => {
+          res.status(201).json({ post: post });
+        }).catch((err) => {
+          res.status(400).json({ message: "Erreur lors de la création du post." });
+        });
+      });
+  
+      writeStream.on("error", (err) => {
+        console.error("Erreur lors de l'écriture du fichier :", err);
+        res.status(500).json({ message: "Erreur lors de l'écriture du fichier." });
+      });
+    } catch (err) {
+      const errors = uploadErrors(err);
+      console.error("Erreur lors du téléchargement de l'image :", err);
+      return res.status(201).json({ errors });
     }
-};
+  };
+
+// module.exports.createPost = async (req, res) => {
+//     const fileName = req.body.posterId + Date.now() + ".jpg";
+
+//     try {
+//         const mimetype = mime.lookup(req.file.originalname);
+    
+//         if (
+//           mimetype !== "image/jpg" &&
+//           mimetype !== "image/png" &&
+//           mimetype !== "image/jpeg"
+//         ) {
+//           throw Error("fichier invalide");
+//         }
+    
+//         if (req.file.size > 500000) {
+//           throw Error("max size");
+//         }
+    
+//         const filePath = path.join(
+//           "./utilisateurs/uploads/posts",//test
+//           fileName
+//         );
+    
+//         if (req.file && req.file.path) {
+//           const fileStream = fs.createReadStream(req.file.path);
+//           const writeStream = fs.createWriteStream(filePath);
+//           await pipeline(fileStream, writeStream);
+//           console.log("Image téléchargée avec succès !");
+//           // Supprimer le fichier temporaire après le téléchargement
+//           fs.unlinkSync(req.file.path);
+    
+//           // Mise à jour de l'utilisateur avec la nouvelle image
+//         } else {
+//           throw Error("Fichier introuvable");
+//         }
+//       } catch (err) {
+//         const errors = uploadErrors(err);
+//         console.error("Erreur lors du téléchargement de l'image :", err);
+//         return res.status(201).json({errors});//La principale différence réside dans le format de la réponse renvoyée par le serveur.
+
+//         // //Lorsque vous utilisez res.status(201).json({errors}), vous renvoyez une réponse au format JSON. 
+//         // La méthode json() de l'objet response de Express est utilisée pour convertir l'objet JavaScript en JSON et 
+//         // renvoyer cette réponse au client. Cela est généralement utilisé lorsque vous souhaitez renvoyer des données 
+//         // structurées au format JSON.
+//       }
+
+
+//     const newPost = new PostModel({
+//     posterId : req.body.posterId,
+//     message : req.body.message,
+//     picture : req.file != null ? "./uploads/posts/" + fileName : "",
+//     video : req.body.video,
+//     likers : [],
+//     comments : []
+//     })
+//     // const {posterId, message, video, likers, comments} = req.body;//destructuring tu aurais pu separer en faisant const = newPost = new postModel.({posterId : req.body.posterId}, ..., likers : [])
+//     // const picture = req.file;
+//     try {
+//         const post = await newPost.save();
+//         res.status(201).json({post : post});
+//     }catch(err) {
+//         res.status(400).send(err);
+//     }
+// };
 
 module.exports.readPost = async(req, res) => {
     

@@ -3,9 +3,11 @@ const authController = require("../controllers/auth.controller.js")
 const userController = require("../controllers/user.controller.js")
 const uploadController = require("../controllers/upload.controller.js")
 const path = require("path");
-const uploadPath = path.join(".", "utilisateurs", "uploads", "profil");//test
+// const uploadPath = path.join( ".", "utilisateurs", "uploads", "posts");//Test
 const multer = require("multer");
-const upload = multer({dest : uploadPath});
+const storage = multer.memoryStorage();
+// const upload = multer({dest : uploadPath});//test
+const upload = multer({storage});
 
 // si on se rend sur api/users/register on déclenche la fonction authController.signUp
 //auth

@@ -6,65 +6,128 @@ const mime = require("mime-types");
 const path = require("path");
 const UserModel = require("../models/user.model.js");
 
+//test=
 
-
+// Importer la connexion à MongoDB
+const mongoose = require("../config/database");
 
 
 module.exports.uploadProfil = async (req, res) => {
-    try {
-      const mimeType = mime.lookup(req.file.originalname);
-  
-      if (
-        mimeType !== "image/jpg" &&
-        mimeType !== "image/png" &&
-        mimeType !== "image/jpeg"
-      ) {
-        throw Error("fichier invalide");
-      }
-  
-      if (req.file.size > 500000) {
-        throw Error("max size");
-      }
-  
-      const fileName = req.body.name + ".jpg";
-      const filePath = path.join(
-        "./utilisateurs/uploads/profil",//test
-        fileName
-      );
-  
-      if (req.file && req.file.path) {
-        const fileStream = fs.createReadStream(req.file.path);
-        const writeStream = fs.createWriteStream(filePath);
-        await pipeline(fileStream, writeStream);
-        console.log("Image téléchargée avec succès !");
-        // Supprimer le fichier temporaire après le téléchargement
-        fs.unlinkSync(req.file.path);
-  
-        // Mise à jour de l'utilisateur avec la nouvelle image
-        const picture = await UserModel.findByIdAndUpdate(
-          req.body.userId,
-          {
-            $set: {
-              picture: "./uploads/profil/" + fileName,
-            },
-          },
-          {
-            new: true,
-            upsert: true,
-            setDefaultsOnInsert: true,
-          }
-        );
-        res.status(200).send(picture);
-      } else {
-        throw Error("Fichier introuvable");
-      }
-    } catch (err) {
-        const errors = uploadErrors(err);
-      console.error("Erreur lors du téléchargement de l'image :", err);
-      // return res.status(201).send({ message: errors });//dans la réponse de l'erreur ça va te donner response.data.message et ensuite ce que tu veux
-      return res.status(201).json({errors});
+  try {
+    const mimetype = mime.lookup(req.file.originalname);
+
+    if (
+      mimetype !== "image/jpg" &&
+      mimetype !== "image/png" &&
+      mimetype !== "image/jpeg"
+    ) {
+      throw Error("fichier invalide");
     }
-  };
+
+    if (req.file.size > 500000) {
+      throw Error("max size");
+    }
+
+    const fileName = req.body.name + ".jpg";
+
+    // Écrire le fichier dans GridFS
+    const writeStream = mongoose.gfs.createWriteStream({
+      filename: fileName,
+      content_type: req.file.mimetype,
+    });
+
+    const readStream = fs.createReadStream(req.file.path);
+    readStream.pipe(writeStream);
+
+    writeStream.on("close", (file) => {
+      console.log("Image téléchargée avec succès !");
+      // Supprimer le fichier temporaire après le téléchargement
+      fs.unlinkSync(req.file.path);
+
+      // Mise à jour de l'utilisateur avec la nouvelle image
+      const picture = UserModel.findByIdAndUpdate(
+        req.body.userId,
+        {
+          $set: {
+            picture: "/api/user/files/" + fileName,
+          },
+        },
+        {
+          new: true,
+          upsert: true,
+          setDefaultsOnInsert: true,
+        }
+      );
+      res.status(200).send(picture);
+    });
+
+    writeStream.on("error", (err) => {
+      console.error("Erreur lors de l'écriture du fichier :", err);
+      res.status(500).json({ message: "Erreur lors de l'écriture du fichier." });
+    });
+  } catch (err) {
+    const errors = uploadErrors(err);
+    console.error("Erreur lors du téléchargement de l'image :", err);
+    return res.status(201).json({ errors });
+  }
+};
+
+
+// module.exports.uploadProfil = async (req, res) => {
+//     try {
+//       const mimeType = mime.lookup(req.file.originalname);
+  
+//       if (
+//         mimeType !== "image/jpg" &&
+//         mimeType !== "image/png" &&
+//         mimeType !== "image/jpeg"
+//       ) {
+//         throw Error("fichier invalide");
+//       }
+  
+//       if (req.file.size > 500000) {
+//         throw Error("max size");
+//       }
+  
+//       const fileName = req.body.name + ".jpg";
+//       const filePath = path.join(
+//         "./utilisateurs/uploads/profil",//test
+//         fileName
+//       );
+  
+//       if (req.file && req.file.path) {
+//         const fileStream = fs.createReadStream(req.file.path);
+//         const writeStream = fs.createWriteStream(filePath);
+//         await pipeline(fileStream, writeStream);
+//         console.log("Image téléchargée avec succès !");
+//         // Supprimer le fichier temporaire après le téléchargement
+//         fs.unlinkSync(req.file.path);
+  
+//         // Mise à jour de l'utilisateur avec la nouvelle image
+//         const picture = await UserModel.findByIdAndUpdate(
+//           req.body.userId,
+//           {
+//             $set: {
+//               picture: "./uploads/profil/" + fileName,
+//             },
+//           },
+//           {
+//             new: true,
+//             upsert: true,
+//             setDefaultsOnInsert: true,
+//           }
+//         );
+//         res.status(200).send(picture);
+//       } else {
+//         throw Error("Fichier introuvable");
+//       }
+//     } catch (err) {
+//         const errors = uploadErrors(err);
+//       console.error("Erreur lors du téléchargement de l'image :", err);
+//       // return res.status(201).send({ message: errors });//dans la réponse de l'erreur ça va te donner response.data.message et ensuite ce que tu veux
+//       return res.status(201).json({errors});
+//     }
+//   };
   
 
 
