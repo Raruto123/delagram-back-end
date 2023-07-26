@@ -3,11 +3,23 @@ const authController = require("../controllers/auth.controller.js")
 const userController = require("../controllers/user.controller.js")
 const uploadController = require("../controllers/upload.controller.js")
 const path = require("path");
-const uploadPath = path.join( ".", "utilisateurs", "uploads")
+// const uploadPath = path.join(__dirname, "..", "client", "public", "uploads", "profil"); /test
 const multer = require("multer");
-// const storage = multer.memoryStorage();
-const upload = multer({dest : uploadPath})
-// const upload = require("../middleware/multer.js")
+// const upload = multer({dest : uploadPath}); //test
+
+const storage = multer.diskStorage({
+    destination : (req, file, cb) => {
+        cb(null, "utilisateurs/uploads") //utilisateurs/uploads ./client/public/uploads/profil
+    },
+    filename : (req, file, cb) => {
+        cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
+    }
+}
+)
+
+const upload = multer({
+    storage : storage
+})
 
 
 // si on se rend sur api/users/register on déclenche la fonction authController.signUp

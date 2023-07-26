@@ -34,7 +34,7 @@ const corsOptions = {
     "preflightContinue" : false
 };
 app.use(cors(corsOptions));
-app.use(express.static("build"))//test
+app.use(express.static("utilisateurs"))
 
 
 //jwt
