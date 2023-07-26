@@ -3,17 +3,8 @@ const postController = require("../controllers/post.controller.js");
 const path = require("path");
 // const uploadPath = path.join(__dirname, "..", "client", "public", "uploads", "profil");
 const multer = require("multer");
+const storage = require("../multer.js");
 // const upload = multer({dest : uploadPath});
-
-const storage = multer.diskStorage({
-    destination : (req, file, cb) => {
-        cb(null, path.join(__dirname, "utilisateurs", "uploads")) //utilisateurs/uploads ./client/public/uploads/profil
-    },
-    filename : (req, file, cb) => {
-        cb(null, file.fieldname + "_" + Date.now() + path.extname(file.originalname))
-    }
-}
-)
 
 const upload = multer({
     storage : storage
